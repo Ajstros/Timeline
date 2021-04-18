@@ -42,7 +42,7 @@ class Timeline:
             event_date = date.fromisoformat(data[1])
             event_era = data[2]
             # Don't have to sort here because the data will have been saved in order
-            events.append(Event(event_title, event_date, event_era))
+            events.append(TimelineEvent(event_title, event_date, event_era))
         
         return cls(title, events, orientation, order)
 
@@ -82,7 +82,7 @@ class Timeline:
 
 # Class to represent an Event in time. Contains the Event's title, 
 # date as a datetime.date object, and era (BC, AD, BCE, CE).
-class Event:
+class TimelineEvent:
     def __init__(self, title, date, era):
         self.title = title
         self.date = date
