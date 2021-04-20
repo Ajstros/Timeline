@@ -51,23 +51,39 @@ class Timeline:
     # The new event is placed in its correct position for forward in time order.
     def add_event(self, new_event):
         # BC or BCE before AD or CE
+        if len(self.events) == 0:
+            self.events.append(new_event)
+            return
+
         for index in range(len(self.events)):
             event = self.events[index]
-            if new_event.get_era() < event.get_era:
-                self.events.insert(new_event, index) # If BC or BCE compared to AD or CE, insert
-            elif new_event.get_era() > event.get_era:
-                continue
-            else: # Same era
-                if new_event.get_date < event.get_date: # If date is before, insert. This means for equal dates, the new date will go after the current one
-                    self.events.insert(new_event, index)
+            if new_event.get_era() < event.get_era():
+                self.events.insert(index, new_event) # If BC or BCE compared to AD or CE, insert
+                return
+            elif new_event.get_era() > event.get_era():
+                if index == len(self.events)-1:
+                    self.events.append(new_event)
+                    return
                 else:
                     continue
-        return
+            else: # Same era
+                if new_event.date < event.date:
+                    self.events.insert(index, new_event)
+                    return
+                elif index == len(self.events)-1:
+                    self.events.append(new_event)
+                    return
+                else:
+                    continue
         
     # Method to remove an event from the list of events by its index.
     def remove_event(self, event_index):
-        self.events.remove(event_index)
+        self.events.pop(event_index)
         return
+
+    # Method to clear all current events from the timeline.
+    def clear_events(self):
+        self.events = []
 
     # Method to save the timeline in CSV format to a file named file_name.
     def save(self, file_name):
@@ -78,6 +94,9 @@ class Timeline:
             for event in self.events:
                 # Ex. Mission Report,1991-12-16,CE
                 writer.writerow(str(event))
+
+    def get_events(self):
+        return self.events
 
 
 # Class to represent an Event in time. Contains the Event's title, 
@@ -100,7 +119,7 @@ class TimelineEvent:
         return self.date
 
     def get_era(self):
-        return self.era
+        return self.era.value
 
 
 # Enum for the orientation of the Timeline

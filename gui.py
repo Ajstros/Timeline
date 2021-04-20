@@ -58,11 +58,42 @@ class GUI:
         return
 
     def draw(self):
-        full_line = self.canvas.create_line(150, 0, 150, 600)
+        self.canvas.delete('all')
+        self.canvas.create_line(150, 0, 150, 600)
+        self.timeline.clear_events()
+
         for i in range(10):
-            new_event = TimelineEvent(
-                self.event_titles[i].get(), self.event_dates[i].get(), Era.CE)
+            try:
+                new_event = TimelineEvent(self.event_titles[i].get(), date.fromisoformat(self.event_dates[i].get()), Era.CE)
+            except ValueError:
+                print('ValueError at '+str(i))
+                continue
             self.timeline.add_event(new_event)
+        
+        print([x.date for x in self.timeline.get_events()])
+
+        ordered_labels = []
+        side = 0
+        try:
+            time_span_days = (self.timeline.get_events()[-1].date - self.timeline.get_events()[0].date).days
+        except IndexError:
+            return
+        if time_span_days == 0:
+            day_distance = 1
+        else:
+            day_distance = 570/time_span_days
+        first_date = self.timeline.get_events()[0].date
+
+        for event in self.timeline.get_events():
+            height = (event.date - first_date).days * day_distance + 10
+            self.canvas.create_window(
+                100+100*side, height, window=Label(self.canvas, text=event.title))
+            self.canvas.create_line(150, height, 100+100*side, height)
+            if side:
+                side = 0
+            else:
+                side = 1
+        
         return
 
 gui = GUI()
